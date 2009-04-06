@@ -1,0 +1,20 @@
+
+  PEB INSTALLATION
+
+  1 Download and compile peb 
+
+     $ wget http://mypweb.googlecode.com/files/peb-***.tar.gz
+	 $ tar xzvf peb-***.tar.gz
+	 $ cd peb-*** 
+     $ phpize
+     $ ./configure --enable-peb
+     $ make
+     $ make install
+
+  2 Enable peb module in your php.ini:
+
+  	 extension=peb.so
+  	 
+ 3 run test script in peb-****/tests
+ 
+ 
