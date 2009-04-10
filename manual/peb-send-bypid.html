@@ -1,0 +1,163 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Send an Erlang message by process ID</title>
+ </head>
+ <body>
+ 
+ <div id="peb_send_bypid" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">peb_send_bypid</h1>
+  <p class="refpurpose"><span class="refname">peb_send_bypid</span> &mdash; <span class="dc-title">Send an Erlang message by process ID</span></p>
+
+ </div>
+
+ <a name="peb_send_bypid.description"></a><div class="refsect1 description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="type">bool</span> <span class="methodname"><b>peb_send_bypid</b></span>
+    (
+     <span class="methodparam"><span class="type">resource</span> <tt class="parameter">$process_id</tt></span>
+	, <span class="methodparam"><span class="type">resource</span> <tt class="parameter">$message_identifier</tt></span>
+   	,[ <span class="methodparam"><span class="type">resource</span> <tt class="parameter">$link_identifier</tt></span>
+  ] )</div>
+
+  <p class="para rdfs-comment"> 
+   <b>peb_send_bypid()</b> send an Erlang message to the Erlang node
+    that&#039;s associated with the specified link identifier. If 
+   <i><tt class="parameter">link_identifier</tt></i>
+ isn&#039;t specified, the last opened 
+   link is used.
+  </p>
+ </div>
+
+
+ <a name="peb_send_bypid.parameters"></a><div class="refsect1 parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   </p><dl>
+
+    <dt class="varlistentry">
+<span class="term"><i><tt class="parameter">
+process_id</tt></i>
+</span>
+</dt><dd class="listitem">
+<p class="para">The process ID on the Erlang node. 
+</p></dd>
+
+
+    <dt class="varlistentry">
+<span class="term"><i><tt class="parameter">
+message_identifier</tt></i>
+</span>
+</dt><dd class="listitem">
+<p class="para">An Erlang message term encoded by <a href="peb-encode.html" class="function">peb_encode()</a>. 
+</p></dd>
+
+    <dt class="varlistentry">
+<span class="term"><i><tt class="parameter">
+link_identifier</tt></i>
+</span>
+</dt><dd class="listitem">
+<p class="para">The Erlang node connection. If the 
+link identifier is not specified, the last link opened by 
+<a href="peb-connect.html" class="function">peb_connect()</a> is assumed. 
+</p></dd>
+
+
+   </dl>
+<p>
+  </p>
+ </div>
+
+
+ <a name="peb_send_bypid.returnvalues"></a><div class="refsect1 returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns <b><tt class="constant">TRUE</tt></b> on success or <b><tt class="constant">FALSE</tt></b> on failure.
+  </p>
+ </div>
+
+
+ <a name="peb_send_bypid.examples"></a><div class="refsect1 examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   </p><div class="example">
+    <p><b>Example #1 <b>peb_send_bypid()</b> example</b></p>
+    <div class="example-contents programlisting">
+<div class="phpcode">
+<code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php&nbsp;<br />$link&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_connect</span><span style="color: #007700">(</span><span style="color: #DD0000">'sadly-desktop@sadly-desktop'</span><span style="color: #007700">,&nbsp;&nbsp;</span><span style="color: #DD0000">'secret'</span><span style="color: #007700">);&nbsp;<br />if&nbsp;(!</span><span style="color: #0000BB">$link</span><span style="color: #007700">)&nbsp;{&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;die(</span><span style="color: #DD0000">'Could&nbsp;not&nbsp;connect:&nbsp;'&nbsp;</span><span style="color: #007700">.&nbsp;</span><span style="color: #0000BB">peb_error</span><span style="color: #007700">());&nbsp;<br />}&nbsp;<br /><br /></span><span style="color: #0000BB">$msg&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_encode</span><span style="color: #007700">(</span><span style="color: #DD0000">"[~p,~a]"</span><span style="color: #007700">,&nbsp;array(&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(</span><span style="color: #0000BB">$link</span><span style="color: #007700">,</span><span style="color: #DD0000">"getinfo"</span><span style="color: #007700">)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);&nbsp;<br /></span><span style="color: #FF8000">//The&nbsp;sender&nbsp;must&nbsp;include&nbsp;a&nbsp;reply&nbsp;address.&nbsp;&nbsp;use&nbsp;~p&nbsp;to&nbsp;format&nbsp;a&nbsp;link&nbsp;identifier&nbsp;to&nbsp;a&nbsp;valid&nbsp;Erlang&nbsp;pid.<br /><br /></span><span style="color: #0000BB">peb_send_byname</span><span style="color: #007700">(</span><span style="color: #DD0000">"pong"</span><span style="color: #007700">,</span><span style="color: #0000BB">$msg</span><span style="color: #007700">,</span><span style="color: #0000BB">$link</span><span style="color: #007700">);&nbsp;<br /><br /></span><span style="color: #0000BB">$message&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_receive</span><span style="color: #007700">(</span><span style="color: #0000BB">$link</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$rs</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_decode</span><span style="color: #007700">(&nbsp;</span><span style="color: #0000BB">$message</span><span style="color: #007700">)&nbsp;;<br /></span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$rs</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$serverpid&nbsp;</span><span style="color: #007700">=</span><span style="color: #0000BB">$rs</span><span style="color: #007700">[</span><span style="color: #0000BB">0</span><span style="color: #007700">][</span><span style="color: #0000BB">0</span><span style="color: #007700">];<br /><br /></span><span style="color: #0000BB">$message&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_encode</span><span style="color: #007700">(</span><span style="color: #DD0000">"[~s]"</span><span style="color: #007700">,&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(&nbsp;</span><span style="color: #DD0000">"how&nbsp;are&nbsp;you"</span><span style="color: #007700">)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);<br /></span><span style="color: #0000BB">peb_send_bypid</span><span style="color: #007700">(</span><span style="color: #0000BB">$serverpid</span><span style="color: #007700">,</span><span style="color: #0000BB">$message</span><span style="color: #007700">,</span><span style="color: #0000BB">$link</span><span style="color: #007700">);&nbsp;<br /></span><span style="color: #FF8000">//just&nbsp;demo&nbsp;for&nbsp;how&nbsp;to&nbsp;use&nbsp;peb_send_bypid<br /><br /></span><span style="color: #0000BB">peb_close</span><span style="color: #007700">(</span><span style="color: #0000BB">$link</span><span style="color: #007700">);&nbsp;<br /></span><span style="color: #0000BB">?&gt;</span>&nbsp;</span>
+</code> 
+</div>
+    </div>
+
+<p><b>pong.erl example code</b></p>
+<div class="phpcode">
+<code>
+<span style="color: #0000BB">
+<pre>
+-module( pong ).
+-export( [ start/0, pong/0 ] ).
+
+start() -&gt;
+    Mypid = spawn( pong, pong, [ ] ),
+    register( pong, Mypid).
+
+pong() -&gt;
+    receive
+        [Pid,getinfo] -&gt; Pid! [self(),welcome],
+            io:fwrite( "Got ~p.~n", [Pid] ),
+	    pong();
+        quit -&gt; ok;
+        X -&gt;
+            io:fwrite( "Got ~p.~n", [ X ] ),
+            pong()
+    end.
+</pre>
+</span>
+</code>  
+</div>
+
+    <div class="example-contents para"><p>will output (on Erlang side):</p></div>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+Got <7160.0.0>.
+Got ["how are you"].
+</pre></div>
+
+	<div class="example-contents para"><p>will output (on php side):</p></div>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+Array
+(
+    [0] => Array
+        (
+            [0] => Resource id #5
+            [1] => welcome
+        )
+
+)
+</pre></div>
+
+
+    </div>
+   </div><p>
+  </p>
+ </div>
+
+
+ <a name="peb_send_bypid.seealso"></a><div class="refsect1 seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   </p><ul class="simplelist">
+    <li class="member"><a href="peb-encode.html" class="function" rel="rdfs-seeAlso">peb_encode()</a> - Encode an Erlang message</li>
+    <li class="member"><a href="peb-send-byname.html" class="function" rel="rdfs-seeAlso">peb_send_byname()</a> - Send an Erlang message by process name</li>
+   </ul><p>
+  </p>
+ </div>
+
+</div>
+
+</body></html>

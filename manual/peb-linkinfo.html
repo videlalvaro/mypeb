@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Get information about the link</title>
+ </head>
+ <body>
+ 
+ <div id="peb-linkinfo" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">peb_linkinfo</h1>
+  <p class="refpurpose"><span class="refname">peb_linkinfo</span> &mdash; <span class="dc-title">Get information about the link</span></p>
+
+ </div>
+
+ <a name="peb-linkinfo.description"></a><div class="refsect1 description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="type">array</span> <span class="methodname"><b>peb_linkinfo</b></span>
+    ([ <span class="methodparam"><span class="type">resource</span> <tt class="parameter">$link_identifier</tt></span>
+  ] )</div>
+
+  <p class="para rdfs-comment">
+   Returns an array that contain detailed information about the link.
+  </p>
+ </div>
+
+
+ <a name="peb-linkinfo.parameters"></a><div class="refsect1 parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   </p><dl>
+
+    <dt class="varlistentry">
+<span class="term"><i><tt class="parameter">
+link_identifier</tt></i>
+</span>
+</dt><dd class="listitem">
+<p class="para">The Erlang node connection. If the 
+link identifier is not specified, the last link opened by 
+<a href="peb-connect.html" class="function">peb_connect()</a> is assumed.</p></dd>
+
+
+   </dl>
+<p>
+  </p>
+ </div>
+
+
+ <a name="peb-linkinfo.returnvalues"></a><div class="refsect1 returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns information about the link on success, or <b><tt class="constant">FALSE</tt></b> on
+   failure.  </p>
+ </div>
+
+
+ <a name="peb-linkinfo.examples"></a><div class="refsect1 examples">
+   <h3 class="title">Examples</h3>
+  <p class="para">
+   </p><div class="example">
+    <p><b>Example #1 <b>peb_error()</b> example</b></p>
+    <div class="example-contents programlisting">
+<div class="phpcode"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />$link&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_connect</span><span style="color: #007700">(</span><span style="color: #DD0000">'sadly-desktop@sadly-desktop'</span><span style="color: #007700">,&nbsp;</span> <span style="color: #DD0000">'secret_cookie'</span><span style="color: #007700">);<br />if&nbsp;(!</span><span style="color: #0000BB">$link</span><span style="color: #007700">)&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;die(</span><span style="color: #DD0000">'Could&nbsp;not&nbsp;connect:&nbsp;['&nbsp;</span>
+<span style="color: #007700">.&nbsp;</span>
+<span style="color: #0000BB">peb_errno</span><span style="color: #007700">()
+<span style="color: #007700">.&nbsp;</span>
+<span style="color: #DD0000">']'&nbsp;</span>
+<span style="color: #007700">.&nbsp;</span>
+<span style="color: #0000BB">peb_error</span><span style="color: #007700">()
+
+);<br />}<br />
+
+<span style="color: #0000BB">$ret</span> = &nbsp;</span><span style="color: #0000BB">peb_linkinfo</span><span style="color: #007700">(</span><span style="color: #0000BB">$link</span><span style="color: #007700">);<br /></span>
+
+<span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$ret</span><span style="color: #007700">);<br /></span>
+
+
+<span style="color: #0000BB">peb_close</span><span style="color: #007700">(</span><span style="color: #0000BB">$link</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span>
+</span>
+</code></div>
+    </div>
+
+    <div class="example-contents para"><p>The above example will output:</p></div>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+Array
+(
+    [thishostname] =&gt; sadly-desktop
+    [thisnodename] =&gt; peb_client_8822_12@sadly-desktop
+    [thisalivename] =&gt; peb_client_8822_12
+    [connectcookie] =&gt; secret_cookie
+    [creation] =&gt; 12
+    [is_persistent] =&gt; 0
+)
+
+</pre></div>
+    </div>
+   </div><p>
+  </p>
+
+ </div>
+
+ <a name="peb-linkinfo.seealso"></a><div class="refsect1 seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   </p><ul class="simplelist">
+    <li class="member"><a href="peb-error.html" class="function" rel="rdfs-seeAlso">peb_error()</a> - Returns the text of the error message from previous peb operation</li>
+    <li class="member"><a href="peb-errno.html" class="function" rel="rdfs-seeAlso">peb_errno()</a> - Returns the numerical value of the error message from previous peb operation</li>
+   </ul><p>
+  </p>
+ </div>
+
+</div>
+
+</body></html>

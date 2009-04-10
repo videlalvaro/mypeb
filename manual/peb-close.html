@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Close Erlang node connection</title>
+ </head>
+ <body>
+
+<div id="peb-close" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">peb_close</h1>
+  <p class="refpurpose"><span class="refname">peb_close</span> &mdash; <span class="dc-title">Close Erlang node connection</span></p>
+
+ </div>
+
+ <a name="peb-close.description"></a><div class="refsect1 description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="type">bool</span> <span class="methodname"><b>peb_close</b></span>
+    ([ <span class="methodparam"><span class="type">resource</span> <tt class="parameter">$link_identifier</tt></span>
+  ] )</div>
+
+  <p class="para rdfs-comment"> 
+   <b>peb_close()</b> closes the non-persistent connection to 
+   the Erlang node that&#039;s associated with the specified link identifier. If 
+   <i><tt class="parameter">link_identifier</tt></i>
+ isn&#039;t specified, the last opened 
+   link is used.
+  </p>
+ </div>
+
+
+ <a name="peb-close.parameters"></a><div class="refsect1 parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   </p><dl>
+
+    <dt class="varlistentry">
+<span class="term"><i><tt class="parameter">
+link_identifier</tt></i>
+</span>
+</dt><dd class="listitem">
+<p class="para">The Erlang node connection. If the 
+link identifier is not specified, the last link opened by 
+<a href="peb-connect.html" class="function">peb_connect()</a> is assumed. </p></dd>
+
+
+   </dl>
+<p>
+  </p>
+ </div>
+
+
+ <a name="peb-close.returnvalues"></a><div class="refsect1 returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns <b><tt class="constant">TRUE</tt></b> on success or <b><tt class="constant">FALSE</tt></b> on failure.
+  </p>
+ </div>
+
+
+ <a name="peb-close.examples"></a><div class="refsect1 examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   </p><div class="example">
+    <p><b>Example #1 <b>peb_close()</b> example</b></p>
+    <div class="example-contents programlisting">
+<div class="phpcode"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />$link&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_connect</span><span style="color: #007700">(</span><span style="color: #DD0000">'node@host.domain'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'secret_cookie'</span><span style="color: #007700">);<br />if&nbsp;(!</span><span style="color: #0000BB">$link</span><span style="color: #007700">)&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;die(</span><span style="color: #DD0000">'Could&nbsp;not&nbsp;connect:&nbsp;'&nbsp;</span><span style="color: #007700">.&nbsp;</span><span style="color: #0000BB">peb_error</span><span style="color: #007700">());<br />}<br />echo&nbsp;</span><span style="color: #DD0000">'Connected&nbsp;successfully'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">peb_close</span><span style="color: #007700">(</span><span style="color: #0000BB">$link</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span>
+</span>
+</code></div>
+    </div>
+
+    <div class="example-contents para"><p>The above example will output:</p></div>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+Connected successfully
+</pre></div>
+    </div>
+   </div><p>
+  </p>
+ </div>
+
+
+ <a name="peb-close.seealso"></a><div class="refsect1 seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   </p><ul class="simplelist">
+    <li class="member"><a href="peb-connect.html" class="function" rel="rdfs-seeAlso">peb_connect()</a> - Open a connection to an Erlang node</li>
+   </ul><p>
+  </p>
+ </div>
+
+</div>
+
+</body></html>

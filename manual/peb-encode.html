@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Encode an Erlang message term</title>
+ </head>
+ <body>
+
+
+<div id="peb-encode" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">peb_encode</h1>
+  <p class="refpurpose"><span class="refname">peb_encode</span> &mdash; <span class="dc-title">Encode an Erlang message term</span></p>
+
+ </div>
+
+ <a name="peb-encode.description"></a><div class="refsect1 description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="type">resource</span> <span class="methodname"><b>peb_encode</b></span>
+    ( <span class="methodparam"><span class="type">string</span> <tt class="parameter">$format_string</tt></span>
+    , <span class="methodparam"><span class="type">string</span> <tt class="parameter">$data</tt></span>
+    )</div>
+
+  <p class="para rdfs-comment">
+   Encode an Erlang message term. 
+  </p>
+ </div>
+
+
+ <a name="peb-encode.parameters"></a><div class="refsect1 parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   </p><dl>
+
+    <dt class="varlistentry">
+
+     <span class="term"><i><tt class="parameter">format_string</tt></i>
+</span>
+
+     </dt><dd class="listitem">
+
+      <p class="para">
+      The format string is composed of one or more directives.<br>
+<pre>
+	    ~a - an atom
+	    ~s - a string
+	    ~b - a binary (contain 0x0 in string)
+	    ~i - an integer
+	    ~l - a long integer
+	    ~u - an unsigned long integer
+	    ~f - a float
+	    ~d - a double float
+	    ~p - an erlang pid
+</pre>
+      </p>
+     </dd>
+   
+    <dt class="varlistentry">
+
+     <span class="term"><i><tt class="parameter">data</tt></i>
+</span>
+
+     </dt><dd class="listitem">
+
+      <p class="para">
+		The data to send to Erlang node.
+		Initial wrapped with an array,  tuple and list data must be wrapped with extra dimension.
+      </p>
+     </dd>
+
+   </dl>
+<p>
+  </p>
+ </div>
+
+
+ <a name="peb-encode.returnvalues"></a><div class="refsect1 returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns an Erlang message identifier on success, or <b><tt class="constant">FALSE</tt></b> on failure.
+  </p>
+ </div>
+
+
+
+ <a name="peb-encode.examples"></a><div class="refsect1 examples">
+  <h3 class="title">Examples</h3>
+  <p><b>Example #1 <b>peb_encode()</b> example</b></p>
+  <p class="para">
+   </p><div class="example">
+    <div class="example-contents programlisting">
+<div class="phpcode">
+
+<code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php
+<br />
+<br />$msg&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_encode</span><span style="color: #007700">(</span><span style="color: #DD0000">"~a"</span><span style="color: #007700">,&nbsp;array(
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"hello"
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">)
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);
+<br /></span><span style="color: #FF8000">//encode&nbsp;a&nbsp;simple&nbsp;atom
+<br />
+<br /></span><span style="color: #0000BB">$msg&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_encode</span><span style="color: #007700">(</span><span style="color: #DD0000">"~d"</span><span style="color: #007700">,&nbsp;array(
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">3.1415926
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">)
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);
+<br /></span><span style="color: #FF8000">//encode&nbsp;a&nbsp;simple&nbsp;double
+<br />
+<br /></span><span style="color: #0000BB">$msg&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_encode</span><span style="color: #007700">(</span><span style="color: #DD0000">"[~a]"</span><span style="color: #007700">,&nbsp;array(
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(</span><span style="color: #DD0000">"hello"</span><span style="color: #007700">)
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);
+<br /></span><span style="color: #FF8000">//encode&nbsp;a&nbsp;list&nbsp;with&nbsp;only&nbsp;one&nbsp;element
+<br />
+<br /></span><span style="color: #0000BB">$msg&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_encode</span><span style="color: #007700">(</span><span style="color: #DD0000">"[~a,~d]"</span><span style="color: #007700">,&nbsp;array(
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(&nbsp;</span><span style="color: #DD0000">"hello"</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">3.1415926</span><span style="color: #007700">)
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
+<br />
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);
+<br /></span><span style="color: #FF8000">//encode&nbsp;a&nbsp;list&nbsp;with&nbsp;two&nbsp;element
+<br />
+<br />
+<br /></span><span style="color: #0000BB">$msg&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_encode</span><span style="color: #007700">(</span><span style="color: #DD0000">"{~a}"</span><span style="color: #007700">,&nbsp;array(
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(&nbsp;</span><span style="color: #DD0000">"hello"</span><span style="color: #007700">)
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);
+<br /></span><span style="color: #FF8000">//encode&nbsp;a&nbsp;tuple&nbsp;with&nbsp;only&nbsp;one&nbsp;element
+<br />
+<br /></span><span style="color: #0000BB">$msg&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_encode</span><span style="color: #007700">(</span><span style="color: #DD0000">"{~a,~i}"</span><span style="color: #007700">,&nbsp;array(
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(&nbsp;</span><span style="color: #DD0000">"hello"</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">1234&nbsp;</span><span style="color: #007700">)
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);
+<br /></span><span style="color: #FF8000">//encode&nbsp;a&nbsp;list&nbsp;with&nbsp;two&nbsp;element
+<br />
+<br /></span><span style="color: #0000BB">$msg&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_encode</span><span style="color: #007700">(</span><span style="color: #DD0000">"{~i,{~a,[~s,~d]}}"</span><span style="color: #007700">,&nbsp;array(
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(&nbsp;</span><span style="color: #0000BB">1234</span><span style="color: #007700">,
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(</span><span style="color: #DD0000">'pi'</span><span style="color: #007700">,
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(</span><span style="color: #DD0000">"is"</span><span style="color: #007700">,</span><span style="color: #0000BB">3.1415926</span><span style="color: #007700">)
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);
+<br /></span><span style="color: #FF8000">//a&nbsp;complex&nbsp;data&nbsp;encode&nbsp;
+<br /></span><span style="color: #0000BB">?&gt;</span>&nbsp;</span>
+</code> 
+
+</div>
+    </div>
+
+   </div><p>
+  </p>
+ </div>
+
+
+ <a name="peb-encode.seealso"></a><div class="refsect1 seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   </p><ul class="simplelist">
+    <li class="member"><a href="peb-decode.html" class="function" rel="rdfs-seeAlso">peb_decode()</a> - Decode an Erlang message</li>
+    <li class="member"><a href="peb-send-byname.html" class="function" rel="rdfs-seeAlso">peb_send_byname()</a> - Send an Erlang message by process name</li>
+    <li class="member"><a href="peb-send-bypid.html" class="function" rel="rdfs-seeAlso">peb_send_bypid()</a> - Send an Erlang message by process ID</li>
+   </ul><p>
+  </p>
+ </div>
+
+</div>
+
+</body></html>

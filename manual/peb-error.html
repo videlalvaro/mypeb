@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Returns the text of the error message from previous peb operation</title>
+ </head>
+ <body>
+ 
+<div id="peb-error" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">peb_error</h1>
+  <p class="refpurpose"><span class="refname">peb_error</span> &mdash; <span class="dc-title">Returns the text of the error message from previous peb operation</span></p>
+
+ </div>
+
+ <a name="peb-error.description"></a><div class="refsect1 description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="type">string</span> <span class="methodname"><b>peb_error</b></span>
+    ()</div>
+
+  <p class="para rdfs-comment">
+   Returns the error text from the last peb function.
+   Note that this function only returns the
+   error text from the most recently executed peb function (not
+   including <b>peb_error()</b> and
+   <a href="peb-errno.html" class="function">peb_errno()</a>), so if you want to use it, make
+   sure you check the value before calling another peb function.
+  </p>
+ </div>
+
+
+ <a name="peb-error.parameters"></a><div class="refsect1 parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   </p><dl>
+
+    <dt class="varlistentry">
+<span class="term"><i><tt class="parameter">
+None</tt></i>
+</span>
+</dt><dd class="listitem">
+<p class="para">
+<p>
+  </p>
+ </div>
+
+
+ <a name="peb-error.returnvalues"></a><div class="refsect1 returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns the error text from the last peb function, or
+   <i>&#039;&#039;</i> (empty string) if no error occurred.
+  </p>
+ </div>
+
+
+  <a name="peb-error.examples"></a><div class="refsect1 examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   </p><div class="example">
+    <p><b>Example #1 <b>peb_error()</b> example</b></p>
+    <div class="example-contents programlisting">
+<div class="phpcode"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />$link&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_connect</span><span style="color: #007700">(</span><span style="color: #DD0000">'node@host.domain'</span><span style="color: #007700">,&nbsp;</span> <span style="color: #DD0000">'secret_cookie'</span><span style="color: #007700">);<br />if&nbsp;(!</span><span style="color: #0000BB">$link</span><span style="color: #007700">)&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;die(</span><span style="color: #DD0000">'Could&nbsp;not&nbsp;connect:&nbsp;['&nbsp;</span>
+<span style="color: #007700">.&nbsp;</span>
+<span style="color: #0000BB">peb_errno</span><span style="color: #007700">()
+<span style="color: #007700">.&nbsp;</span>
+<span style="color: #DD0000">']'&nbsp;</span>
+<span style="color: #007700">.&nbsp;</span>
+<span style="color: #0000BB">peb_error</span><span style="color: #007700">()
+
+);<br />}<br />echo&nbsp;</span><span style="color: #DD0000">'Connected&nbsp;successfully'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">peb_close</span><span style="color: #007700">(</span><span style="color: #0000BB">$link</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span>
+</span>
+</code></div>
+    </div>
+
+    <div class="example-contents para"><p>The above example will output 
+something similar to:</p></div>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+Could not connect: [2] ei_connect error
+</pre></div>
+    </div>
+   </div><p>
+  </p>
+ </div>
+
+
+ <a name="peb-error.seealso"></a><div class="refsect1 seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   </p><ul class="simplelist">
+    <li class="member"><a href="peb-errno.html" class="function" rel="rdfs-seeAlso">peb_errno()</a> - Returns the numerical value of the error message from previous peb operation</li>
+   </ul><p>
+  </p>
+ </div>
+
+</div>
+
+</body></html>

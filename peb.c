@@ -88,7 +88,6 @@ int is_persistent;
  * Every user visible function must have an entry in peb_functions[].
  */
 zend_function_entry peb_functions[] = {
-	PHP_FE(confirm_peb_compiled,	NULL)
 	PHP_FE(peb_connect,	NULL)
 	PHP_FE(peb_pconnect,	NULL)
 	PHP_FE(peb_close,	NULL)
@@ -99,6 +98,7 @@ zend_function_entry peb_functions[] = {
 	PHP_FE(peb_decode,	NULL)
 	PHP_FE(peb_error,	NULL)
 	PHP_FE(peb_errorno,	NULL)
+	PHP_FE(peb_linkinfo,	NULL)
 	PHP_FE(peb_status,	NULL)
 	{NULL, NULL, NULL}	/* Must be the last line in peb_functions[] */
 };
@@ -273,6 +273,15 @@ PHP_MINFO_FUNCTION(peb)
    Return a string to confirm that the module is compiled in */
 PHP_FUNCTION(peb_status)
 {
+    php_printf("\r\n<br>default link: %d",PEB_G(default_link));
+    php_printf("\r\n<br>num link: %d",PEB_G(num_link));
+    php_printf("\r\n<br>num persistent: %d",PEB_G(num_persistent));
+	return;
+}
+
+   
+PHP_FUNCTION(peb_linkinfo)
+{
 	peb_link *m;
 	zval * tmp;
 
@@ -286,31 +295,16 @@ PHP_FUNCTION(peb_status)
 
     ZEND_FETCH_RESOURCE2(m, peb_link*, &tmp TSRMLS_CC,-1 , PEB_RESOURCENAME ,le_link, le_plink);
 
-    php_printf("\r\n<br>default link: %d",PEB_G(default_link));
-    php_printf("\r\n<br>thisnodename: %s",m->ec->thisnodename);
-    php_printf("\r\n<br>pid: %d",m->ec->self);    
-    php_printf("\r\n<br>num link: %d",PEB_G(num_link));
-    php_printf("\r\n<br>num persistent: %d",PEB_G(num_persistent));
-    php_printf("\r\n<br>error: %s",PEB_G(error));
-    php_printf("\r\n<br>errorno: %d",PEB_G(errorno));
-
-	return;
+	array_init(return_value);
+	add_assoc_string(return_value, "thishostname", m->ec->thishostname,1);
+	add_assoc_string(return_value, "thisnodename", m->ec->thisnodename,1);	
+	add_assoc_string(return_value, "thisalivename", m->ec->thisalivename,1);		
+	add_assoc_string(return_value, "connectcookie", m->ec->ei_connect_cookie,1);
+	add_assoc_long(return_value, "creation", m->ec->creation);	
+	add_assoc_long(return_value, "is_persistent", m->is_persistent);		
+	
 }
 
-
-PHP_FUNCTION(confirm_peb_compiled)
-{
-	char *arg = NULL;
-	int arg_len, len;
-	char *strg;
-
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &arg, &arg_len) == FAILURE) {
-		return;
-	}
-
-	len = spprintf(&strg, 0, "Congratulations! You have successfully modified ext/%.78s/config.m4. Module %.78s is now compiled into PHP.", "peb", arg);
-	RETURN_STRINGL(strg, len, 0);
-}
 
 static void php_peb_connect_impl(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 {
@@ -389,7 +383,7 @@ static void php_peb_connect_impl(INTERNAL_FUNCTION_PARAMETERS, int persistent)
         newle->ptr = alink;
         newle->type = le_plink;
         zend_hash_update(&EG(persistent_list), key, key_len+1, newle,sizeof(list_entry), NULL );
-
+        PEB_G(default_link) = Z_LVAL_P(return_value TSRMLS_CC);
         ZEND_REGISTER_RESOURCE(return_value, alink, le_plink);
     }
     else {
@@ -399,7 +393,6 @@ static void php_peb_connect_impl(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 
     efree(key);
 
-    PEB_G(default_link) = Z_LVAL_P(return_value TSRMLS_CC);
 	/*
 	if (PEB_G(default_link) != -1) {
 		zend_list_delete(PEB_G(default_link));
@@ -411,11 +404,17 @@ static void php_peb_connect_impl(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 
 PHP_FUNCTION(peb_connect)
 {
+    PEB_G(error) = NULL;
+    PEB_G(errorno) = 0;
+
     php_peb_connect_impl(INTERNAL_FUNCTION_PARAM_PASSTHRU, 0);
 }
 
 PHP_FUNCTION(peb_pconnect)
 {
+    PEB_G(error) = NULL;
+    PEB_G(errorno) = 0;
+    
     php_peb_connect_impl(INTERNAL_FUNCTION_PARAM_PASSTHRU, 1);
 }
 
@@ -424,6 +423,9 @@ PHP_FUNCTION(peb_close)
 {
     peb_link *m;
 	zval *tmp=NULL;
+
+    PEB_G(error) = NULL;
+    PEB_G(errorno) = 0;
 
     if (ZEND_NUM_ARGS() TSRMLS_CC ==0) {
         if(PEB_G(default_link)>0){
@@ -453,7 +455,10 @@ PHP_FUNCTION(peb_send_byname)
 	zval * tmp=NULL;
 	zval * msg=NULL;
 	ei_x_buff * newbuff;
-	
+
+    PEB_G(error) = NULL;
+    PEB_G(errorno) = 0;
+
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sr|r", &model_name, &m_len, &msg, &tmp) ==FAILURE) {
         RETURN_FALSE;
     }
@@ -488,7 +493,10 @@ PHP_FUNCTION(peb_send_bypid)
 	zval * pid=NULL;
 	erlang_pid * serverpid;
 	ei_x_buff * newbuff;
-	
+
+    PEB_G(error) = NULL;
+    PEB_G(errorno) = 0;
+
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rr|r",&pid,&msg, &tmp) ==FAILURE) {
         RETURN_FALSE;
     }
@@ -520,6 +528,9 @@ PHP_FUNCTION(peb_receive)
     zval * tmp;
 	ei_x_buff * newbuff;
     erlang_msg msg;
+
+    PEB_G(error) = NULL;
+    PEB_G(errorno) = 0;
 
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|r", &tmp) ==FAILURE) {
         RETURN_FALSE;
@@ -681,9 +692,10 @@ int _peb_encode(ei_x_buff* x, char** fmt, int * fmtpos, HashTable *arr, unsigned
     /*
     ~a - an atom, char*
     ~s - a string, char*
+    ~b - a binary, char*    
     ~i - an integer, int
     ~l - a long integer, long int
-    ~u - a unsigned long integer, unsigned long int
+    ~u - an unsigned long integer, unsigned long int
     ~f - a float, float
     ~d - a double float, double float
     ~p - an erlang pid
@@ -798,6 +810,9 @@ PHP_FUNCTION(peb_encode)
     ei_x_buff * x;
     HashTable * htable;
 
+    PEB_G(error) = NULL;
+    PEB_G(errorno) = 0;
+
     if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa", &fmt, &fmt_len, &tmp)==FAILURE) {
         RETURN_FALSE;
     }
@@ -910,6 +925,9 @@ PHP_FUNCTION(peb_decode)
     char atom[ MAXATOMLEN ];
     zval * tmp, * htable;
     ei_x_buff * x;
+
+    PEB_G(error) = NULL;
+    PEB_G(errorno) = 0;
 
     if( zend_parse_parameters( ZEND_NUM_ARGS() TSRMLS_CC, "r", & tmp ) == FAILURE ) {
         RETURN_FALSE;

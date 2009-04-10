@@ -57,7 +57,6 @@ PHP_RINIT_FUNCTION(peb);
 PHP_RSHUTDOWN_FUNCTION(peb);
 PHP_MINFO_FUNCTION(peb);
 
-PHP_FUNCTION(confirm_peb_compiled);
 PHP_FUNCTION(peb_connect);
 PHP_FUNCTION(peb_pconnect);
 PHP_FUNCTION(peb_close);
@@ -68,6 +67,8 @@ PHP_FUNCTION(peb_encode);
 PHP_FUNCTION(peb_decode);
 PHP_FUNCTION(peb_error);
 PHP_FUNCTION(peb_errorno);
+
+PHP_FUNCTION(peb_linkinfo);
 
 PHP_FUNCTION(peb_status);
 
