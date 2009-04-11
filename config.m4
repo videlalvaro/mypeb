@@ -16,7 +16,7 @@ dnl Otherwise use enable:
 PHP_ARG_ENABLE(peb, whether to enable php-erlang bridge support,
 [  --enable-peb           Enable php-erlang bridge support])
 
-if test "$PHP_PEB" != "no"; then
+if test "$PHP_PEB" = "yes"; then
   dnl Write more examples of tests here...
 
   dnl # --with-peb -> check with-path
