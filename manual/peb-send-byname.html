@@ -94,11 +94,11 @@ link identifier is not specified, the last link opened by
 <br />&nbsp;&nbsp;&nbsp;&nbsp;die(</span><span style="color: #DD0000">'Could&nbsp;not&nbsp;connect:&nbsp;'&nbsp;</span><span style="color: #007700">.&nbsp;</span><span style="color: #0000BB">peb_error</span><span style="color: #007700">());
 <br />}
 <br />
-<br /></span><span style="color: #0000BB">$msg&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_encode</span><span style="color: #007700">(</span><span style="color: #DD0000">"[~a,~a]"</span><span style="color: #007700">,&nbsp;array(
-<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(&nbsp;</span><span style="color: #DD0000">"hello"</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">"friend"&nbsp;</span><span style="color: #007700">)
+<br /></span><span style="color: #0000BB">$msg&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">peb_encode</span><span style="color: #007700">(</span><span style="color: #DD0000">'[~a,~a]'</span><span style="color: #007700">,&nbsp;array(
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(&nbsp;</span><span style="color: #DD0000">'hello'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'friend'&nbsp;</span><span style="color: #007700">)
 <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
 <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);
-<br /></span><span style="color: #0000BB">peb_send_byname</span><span style="color: #007700">(</span><span style="color: #DD0000">"pong"</span><span style="color: #007700">,</span><span style="color: #0000BB">$msg</span><span style="color: #007700">,</span><span style="color: #0000BB">$link</span><span style="color: #007700">);
+<br /></span><span style="color: #0000BB">peb_send_byname</span><span style="color: #007700">(</span><span style="color: #DD0000">'pong'</span><span style="color: #007700">,</span><span style="color: #0000BB">$msg</span><span style="color: #007700">,</span><span style="color: #0000BB">$link</span><span style="color: #007700">);
 <br />
 <br /></span><span style="color: #0000BB">peb_close</span><span style="color: #007700">(</span><span style="color: #0000BB">$link</span><span style="color: #007700">);
 <br /></span><span style="color: #0000BB">?&gt;</span>&nbsp;</span>
