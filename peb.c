@@ -1,5 +1,5 @@
 /*
- 	Copyright (c) 2005-2010, York Liu <sadly@phpx.com>.
+ 	Copyright (c) 2005-2010, York Liu <sadly@phpx.com>, Alvaro Videla <videlalvaro@gmail.com>
  	All rights reserved.
  	
  	Redistribution and use in source and binary forms, with or without
@@ -12,8 +12,7 @@
  	      copyright notice, this list of conditions and the following
  	      disclaimer in the documentation and/or other materials provided
  	      with the distribution.
- 	    * Neither the name Message Systems, Inc. nor the names
- 	      of its contributors may be used to endorse or promote products
+ 	    * The names of the contributors may not be used to endorse or promote products
  	      derived from this software without specific prior written
  	      permission.
  	
@@ -169,16 +168,16 @@ static ZEND_RSRC_DTOR_FUNC(le_link_dtor)
         peb_link * tmp = (peb_link *) rsrc->ptr;
         int p = tmp->is_persistent;
         
-		/*close fd first?*/
+        /*close fd first?*/
 		
         pefree(tmp->ec, p);
         efree(tmp->node);
         efree(tmp->secret);
 
-        // alvaro
-        php_printf("<br>ZEND_RSRC_DTOR_FUNC called \r\n"); 
+        #ifdef DEBUG_PRINTF
+        php_printf("<br>ZEND_RSRC_DTOR_FUNC called tmo \r\n");
+        #endif
         close(tmp->fd);
-        // alvaro
 
         pefree(tmp, p);
         if(p)
@@ -320,19 +319,24 @@ PHP_FUNCTION(peb_linkinfo)
 static void php_peb_connect_impl(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 {
   
-	char *node=NULL, *secret=NULL;
+    char *node=NULL, *secret=NULL;
     char * thisnode = NULL;
     char * key = NULL;
-	int  node_len, secret_len, key_len, this_len;
+    int  node_len, secret_len, key_len, this_len;
+    unsigned int tmo = 0;
 
     peb_link * alink = NULL;
     ei_cnode * ec = NULL;
     list_entry * le ;
     list_entry * newle;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"ss",&node,&node_len,&secret,&secret_len)==FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"ss|l",&node,&node_len,&secret,&secret_len,&tmo)==FAILURE) {
         RETURN_FALSE;
     }
+    
+    #ifdef DEBUG_PRINTF
+    php_printf("timeout :%d", tmo);
+    #endif
 
     key_len = spprintf(&key, 0, "peb_%s_%s",node,secret);
 
@@ -373,12 +377,12 @@ static void php_peb_connect_impl(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 
 	efree(thisnode);
 
-    if ((fd = ei_connect(ec,node)) < 0) {
+    if ((fd = ei_connect_tmo(ec,node, tmo)) < 0) {
         PEB_G(errorno) = PEB_ERRORNO_CONN;
-		PEB_G(error)=estrdup(PEB_ERROR_CONN);
-		efree(key);
-		pefree(ec, persistent);
-		RETURN_FALSE
+        PEB_G(error)=estrdup(PEB_ERROR_CONN);
+        efree(key);
+        pefree(ec, persistent);
+        RETURN_FALSE
     }
 
     alink = pemalloc(sizeof(peb_link),persistent);
@@ -463,6 +467,7 @@ PHP_FUNCTION(peb_send_byname)
 {
     char * model_name;
     int m_len, ret;
+    unsigned int tmo = 0;
    
     peb_link *m;
     zval * tmp=NULL;
@@ -472,7 +477,7 @@ PHP_FUNCTION(peb_send_byname)
     PEB_G(error) = NULL;
     PEB_G(errorno) = 0;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sr|r", &model_name, &m_len, &msg, &tmp) ==FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sr|rl", &model_name, &m_len, &msg, &tmp, &tmo) ==FAILURE) {
         RETURN_FALSE;
     }
 
@@ -485,7 +490,7 @@ PHP_FUNCTION(peb_send_byname)
 
     ZEND_FETCH_RESOURCE(newbuff, ei_x_buff *, &msg TSRMLS_CC,-1 , PEB_TERMRESOURCE ,le_msgbuff);
 	
-    ret = ei_reg_send(m->ec, m->fd, model_name, newbuff->buff, newbuff->index);
+    ret = ei_reg_send_tmo(m->ec, m->fd, model_name, newbuff->buff, newbuff->index, tmo);
 
     if (ret<0){
     	/* process peb_error here */
@@ -591,17 +596,18 @@ PHP_FUNCTION(peb_rpc_to)
 PHP_FUNCTION(peb_send_bypid)
 {
     int ret;
+    unsigned int tmo = 0;
     peb_link *m;
-	zval * tmp=NULL;
-	zval * msg=NULL;
-	zval * pid=NULL;
-	erlang_pid * serverpid;
-	ei_x_buff * newbuff;
+    zval * tmp=NULL;
+    zval * msg=NULL;
+    zval * pid=NULL;
+    erlang_pid * serverpid;
+    ei_x_buff * newbuff;
 
     PEB_G(error) = NULL;
     PEB_G(errorno) = 0;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rr|r",&pid,&msg, &tmp) ==FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rr|rl",&pid,&msg, &tmp, &tmo) ==FAILURE) {
         RETURN_FALSE;
     }
 
@@ -614,7 +620,7 @@ PHP_FUNCTION(peb_send_bypid)
     ZEND_FETCH_RESOURCE(newbuff, ei_x_buff *, &msg TSRMLS_CC,-1 , PEB_TERMRESOURCE ,le_msgbuff);
     ZEND_FETCH_RESOURCE(serverpid, erlang_pid *, &pid TSRMLS_CC,-1 , PEB_SERVERPID ,le_serverpid);    
 
-    ret = ei_send( m->fd, serverpid, newbuff->buff, newbuff->index);
+    ret = ei_send_tmo( m->fd, serverpid, newbuff->buff, newbuff->index, tmo);
     if (ret<0){
     	/* process peb_error here */
         PEB_G(errorno) = PEB_ERRORNO_SEND;
@@ -628,15 +634,16 @@ PHP_FUNCTION(peb_send_bypid)
 PHP_FUNCTION(peb_receive)
 {
     int ret;
+    unsigned int tmo = 1000;
     peb_link * m;
     zval * tmp;
-	ei_x_buff * newbuff;
+    ei_x_buff * newbuff;
     erlang_msg msg;
 
     PEB_G(error) = NULL;
     PEB_G(errorno) = 0;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|r", &tmp) ==FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|rl", &tmp, &tmo) ==FAILURE) {
         RETURN_FALSE;
     }
 
@@ -651,7 +658,7 @@ PHP_FUNCTION(peb_receive)
 	ei_x_new(newbuff);
 	
 	while(1){
-		ret = ei_xreceive_msg_tmo(m->fd, &msg, newbuff,1000);
+		ret = ei_xreceive_msg_tmo(m->fd, &msg, newbuff,tmo);
 		switch(ret){
 			case ERL_TICK: /* idle */
     	        break;
