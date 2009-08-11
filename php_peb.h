@@ -61,10 +61,14 @@ PHP_FUNCTION(peb_connect);
 PHP_FUNCTION(peb_pconnect);
 PHP_FUNCTION(peb_close);
 PHP_FUNCTION(peb_send_byname);
+PHP_FUNCTION(peb_rpc);
+PHP_FUNCTION(peb_rpc_to);
 PHP_FUNCTION(peb_send_bypid);
 PHP_FUNCTION(peb_receive);
 PHP_FUNCTION(peb_encode);
+PHP_FUNCTION(peb_vencode);
 PHP_FUNCTION(peb_decode);
+PHP_FUNCTION(peb_vdecode);
 PHP_FUNCTION(peb_error);
 PHP_FUNCTION(peb_errorno);
 

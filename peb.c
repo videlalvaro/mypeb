@@ -93,9 +93,13 @@ zend_function_entry peb_functions[] = {
 	PHP_FE(peb_close,	NULL)
 	PHP_FE(peb_send_byname,	NULL)
 	PHP_FE(peb_send_bypid,	NULL)	
+	PHP_FE(peb_rpc,	NULL)	
+	PHP_FE(peb_rpc_to,	NULL)	
 	PHP_FE(peb_receive,	NULL)
+	PHP_FE(peb_vencode,	NULL)
 	PHP_FE(peb_encode,	NULL)
 	PHP_FE(peb_decode,	NULL)
+	PHP_FE(peb_vdecode,	NULL)
 	PHP_FE(peb_error,	NULL)
 	PHP_FE(peb_errorno,	NULL)
 	PHP_FE(peb_linkinfo,	NULL)
@@ -143,7 +147,7 @@ PHP_INI_END()
 static ZEND_RSRC_DTOR_FUNC(le_msgbuff_dtor)
 {
 	if(rsrc->ptr) {
-		ei_x_buff * tmp = (ei_x_buff *) rsrc->ptr;;
+		ei_x_buff * tmp = (ei_x_buff *) rsrc->ptr;
 		ei_x_free(tmp);
 		efree(tmp);
 		rsrc->ptr = NULL;
@@ -164,12 +168,18 @@ static ZEND_RSRC_DTOR_FUNC(le_link_dtor)
     if (rsrc->ptr) {
         peb_link * tmp = (peb_link *) rsrc->ptr;
         int p = tmp->is_persistent;
-
+        
 		/*close fd first?*/
 		
         pefree(tmp->ec, p);
         efree(tmp->node);
         efree(tmp->secret);
+
+        // alvaro
+        php_printf("<br>ZEND_RSRC_DTOR_FUNC called \r\n"); 
+        close(tmp->fd);
+        // alvaro
+
         pefree(tmp, p);
         if(p)
             PEB_G(num_persistent)--;
@@ -309,6 +319,7 @@ PHP_FUNCTION(peb_linkinfo)
 
 static void php_peb_connect_impl(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 {
+  
 	char *node=NULL, *secret=NULL;
     char * thisnode = NULL;
     char * key = NULL;
@@ -423,7 +434,7 @@ PHP_FUNCTION(peb_pconnect)
 PHP_FUNCTION(peb_close)
 {
     peb_link *m;
-	zval *tmp=NULL;
+    zval *tmp=NULL;
 
     PEB_G(error) = NULL;
     PEB_G(errorno) = 0;
@@ -440,11 +451,12 @@ PHP_FUNCTION(peb_close)
         RETURN_FALSE;
     }
 
-	ZEND_FETCH_RESOURCE2(m, peb_link*, &tmp TSRMLS_CC, -1, PEB_RESOURCENAME, le_link, le_plink);
+    ZEND_FETCH_RESOURCE2(m, peb_link*, &tmp TSRMLS_CC, -1, PEB_RESOURCENAME, le_link, le_plink);
+    
     zend_list_delete(Z_RESVAL_P(tmp));
 
     if(Z_RESVAL_P(tmp)==PEB_G(default_link)) PEB_G(default_link) = -1;
-	RETURN_TRUE;
+    RETURN_TRUE;
 }
 
 PHP_FUNCTION(peb_send_byname)
@@ -453,9 +465,9 @@ PHP_FUNCTION(peb_send_byname)
     int m_len, ret;
    
     peb_link *m;
-	zval * tmp=NULL;
-	zval * msg=NULL;
-	ei_x_buff * newbuff;
+    zval * tmp=NULL;
+    zval * msg=NULL;
+    ei_x_buff * newbuff;
 
     PEB_G(error) = NULL;
     PEB_G(errorno) = 0;
@@ -483,6 +495,97 @@ PHP_FUNCTION(peb_send_byname)
     }
 
 	RETURN_TRUE;
+}
+
+PHP_FUNCTION(peb_rpc)
+{
+    char * model_name;
+    char * fun_name;
+    int m_len, f_len, ret;
+
+    peb_link *m;
+    zval * tmp=NULL;
+    zval * msg=NULL;
+    ei_x_buff * newbuff;
+    ei_x_buff * result;
+
+    PEB_G(error) = NULL;
+    PEB_G(errorno) = 0;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ssr|r", &model_name, &m_len, &fun_name, &f_len, &msg, &tmp) ==FAILURE) {
+        RETURN_FALSE;
+    }
+
+
+    if(ZEND_NUM_ARGS()==3){
+        ALLOC_INIT_ZVAL(tmp);
+        ZVAL_RESOURCE(tmp,PEB_G(default_link));
+    }
+
+    ZEND_FETCH_RESOURCE2(m, peb_link*, &tmp TSRMLS_CC,-1 , PEB_RESOURCENAME ,le_link, le_plink);
+
+    ZEND_FETCH_RESOURCE(newbuff, ei_x_buff *, &msg TSRMLS_CC,-1 , PEB_TERMRESOURCE ,le_msgbuff);
+
+    result = emalloc(sizeof(ei_x_buff));
+    ei_x_new(result);
+
+    ret = ei_rpc(m->ec, m->fd, model_name, fun_name, newbuff->buff, newbuff->index, result);
+    
+//    php_printf("ei_rpc ret: %d\r\n<br />", ret);
+
+    if (ret<0){
+        /* process peb_error here */
+        PEB_G(errorno) = PEB_ERRORNO_SEND;
+        PEB_G(error)=estrdup(PEB_ERROR_SEND);
+        
+        //TODO free resources here. ?? alvaro
+        ei_x_free(result);
+        efree(result);
+        RETURN_FALSE;
+    }
+    
+    ZEND_REGISTER_RESOURCE(return_value, result, le_msgbuff);
+}
+
+
+PHP_FUNCTION(peb_rpc_to)
+{
+    char * model_name;
+    char * fun_name;
+    int m_len, f_len, ret;
+   
+    peb_link *m;
+    zval * tmp=NULL;
+    zval * msg=NULL;
+    ei_x_buff * newbuff;
+
+    PEB_G(error) = NULL;
+    PEB_G(errorno) = 0;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ssr|r", &model_name, &m_len, &fun_name, &f_len, &msg, &tmp) ==FAILURE) {
+        RETURN_FALSE;
+    }
+    
+
+    if(ZEND_NUM_ARGS()==3){
+        ALLOC_INIT_ZVAL(tmp);
+        ZVAL_RESOURCE(tmp,PEB_G(default_link));
+    }
+
+    ZEND_FETCH_RESOURCE2(m, peb_link*, &tmp TSRMLS_CC,-1 , PEB_RESOURCENAME ,le_link, le_plink);
+
+    ZEND_FETCH_RESOURCE(newbuff, ei_x_buff *, &msg TSRMLS_CC,-1 , PEB_TERMRESOURCE ,le_msgbuff);
+    
+    ret = ei_rpc_to(m->ec, m->fd, model_name, fun_name, newbuff->buff, newbuff->index);
+
+    if (ret<0){
+        /* process peb_error here */
+        PEB_G(errorno) = PEB_ERRORNO_SEND;
+        PEB_G(error)=estrdup(PEB_ERROR_SEND);
+        RETURN_FALSE;
+    }
+
+  RETURN_TRUE;
 }
 
 PHP_FUNCTION(peb_send_bypid)
@@ -647,7 +750,6 @@ int _peb_encode_term(ei_x_buff* x,char **fmt,int * fmtpos, HashTable *arr, unsig
         }
         ++(*arridx);
         break;
-    
     case 'f':
     case 'd':
         if (zend_hash_index_find(arr,*arridx,(void**) &pdata)==SUCCESS) { 
@@ -710,7 +812,7 @@ int _peb_encode(ei_x_buff* x, char** fmt, int * fmtpos, HashTable *arr, unsigned
     zval * tmp;
 	ei_x_buff * newbuff;
 
-/*     php_printf("<br>enter for fmtpos %d fmtstr: %c </br>\r\n\r\n", *fmtpos, *p ); */
+     // php_printf("<br>enter for fmtpos %d fmtstr: %c </br>\r\n\r\n", *fmtpos, *p ); 
 	        
     while (*p==' ')
     {
@@ -799,31 +901,51 @@ int _peb_encode(ei_x_buff* x, char** fmt, int * fmtpos, HashTable *arr, unsigned
     _peb_encode(x,fmt,fmtpos,arr,arridx);
 }
 
-PHP_FUNCTION(peb_encode)
+static void php_peb_encode_impl(INTERNAL_FUNCTION_PARAMETERS, int with_version)
 {
-    char * fmt;
-    int fmt_len;
-    int fmtpos=0;
-    int res;
-    unsigned long arridx=0;
+  char * fmt;
+  int fmt_len;
+  int fmtpos=0;
+  int res;
+  unsigned long arridx=0;
 
-    zval * tmp;
-    ei_x_buff * x;
-    HashTable * htable;
+  zval * tmp;
+  ei_x_buff * x;
+  HashTable * htable;
 
+  if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa", &fmt, &fmt_len, &tmp)==FAILURE) {
+      RETURN_FALSE;
+  }
+
+  htable = Z_ARRVAL_P(tmp); /* find hashtable for array */
+
+  x=emalloc(sizeof(ei_x_buff));
+  
+  
+  if(with_version){
+    ei_x_new_with_version(x);
+  } else{
+    ei_x_new(x);
+  }
+  
+  _peb_encode(x, &fmt, &fmtpos, htable,&arridx);
+  ZEND_REGISTER_RESOURCE(return_value,x,le_msgbuff);
+}
+
+PHP_FUNCTION(peb_vencode)
+{
     PEB_G(error) = NULL;
     PEB_G(errorno) = 0;
 
-    if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa", &fmt, &fmt_len, &tmp)==FAILURE) {
-        RETURN_FALSE;
-    }
+    php_peb_encode_impl(INTERNAL_FUNCTION_PARAM_PASSTHRU, 1);
+}
 
-    htable = Z_ARRVAL_P(tmp); /* find hashtable for array */
+PHP_FUNCTION(peb_encode)
+{
+    PEB_G(error) = NULL;
+    PEB_G(errorno) = 0;
 
-    x=emalloc(sizeof(ei_x_buff));
-    ei_x_new_with_version(x);
-    _peb_encode(x, &fmt, &fmtpos, htable,&arridx);
-	ZEND_REGISTER_RESOURCE(return_value,x,le_msgbuff);
+    php_peb_encode_impl(INTERNAL_FUNCTION_PARAM_PASSTHRU, 0);
 }
 
 int _peb_decode( ei_x_buff * x ,zval * htable) {
@@ -869,7 +991,8 @@ int _peb_decode( ei_x_buff * x ,zval * htable) {
         ZEND_REGISTER_RESOURCE(z, buff, le_serverpid);
         add_next_index_zval( htable, z);                        
         break;
-
+    
+    case ERL_SMALL_BIG_EXT:
     case ERL_SMALL_INTEGER_EXT:    
     case ERL_INTEGER_EXT:
         ei_decode_long( x->buff, & x->index, & long_value );
@@ -913,41 +1036,61 @@ int _peb_decode( ei_x_buff * x ,zval * htable) {
     default:
         php_error( E_ERROR, "unsupported data type %d", type );
         PEB_G(errorno) = PEB_ERRORNO_DECODE;
-		PEB_G(error)=estrdup(PEB_ERROR_DECODE);        
+        PEB_G(error)=estrdup(PEB_ERROR_DECODE);        
         return FAILURE;
     }
 
     return SUCCESS;
 }
 
+static void php_peb_decode_impl(INTERNAL_FUNCTION_PARAMETERS, int with_version)
+{
+  int v, ret;
+  char atom[ MAXATOMLEN ];
+  zval * tmp, * htable;
+  ei_x_buff * x;
+
+  PEB_G(error) = NULL;
+  PEB_G(errorno) = 0;
+  
+  if( zend_parse_parameters( ZEND_NUM_ARGS() TSRMLS_CC, "r", & tmp ) == FAILURE ) {
+      RETURN_FALSE;
+  }
+
+  ZEND_FETCH_RESOURCE(x, ei_x_buff *, & tmp, -1, PEB_TERMRESOURCE, le_msgbuff);
+  
+  x->index = 0;
+  if(with_version){
+    ei_decode_version( x->buff, & x->index, & v );
+  }
+
+  ALLOC_INIT_ZVAL(htable);
+  
+  array_init(htable);
+  
+  ret = _peb_decode( x ,htable);
+  
+  if( ret==SUCCESS) {
+      * return_value = * htable;    
+  } else {
+      RETURN_FALSE;
+  }
+}
+
 PHP_FUNCTION(peb_decode)
 {
-    int v, ret;
-    char atom[ MAXATOMLEN ];
-    zval * tmp, * htable;
-    ei_x_buff * x;
+  PEB_G(error) = NULL;
+  PEB_G(errorno) = 0;
 
-    PEB_G(error) = NULL;
-    PEB_G(errorno) = 0;
+  php_peb_decode_impl(INTERNAL_FUNCTION_PARAM_PASSTHRU, 0);
+}
 
-    if( zend_parse_parameters( ZEND_NUM_ARGS() TSRMLS_CC, "r", & tmp ) == FAILURE ) {
-        RETURN_FALSE;
-    }
+PHP_FUNCTION(peb_vdecode)
+{
+  PEB_G(error) = NULL;
+  PEB_G(errorno) = 0;
 
-    ZEND_FETCH_RESOURCE(x, ei_x_buff *, & tmp, -1, PEB_TERMRESOURCE, le_msgbuff);
-
-    x->index = 0;
-    ei_decode_version( x->buff, & x->index, & v );
-
-    ALLOC_INIT_ZVAL(htable);
-    array_init(htable);
-    ret = _peb_decode( x ,htable);
-    
-    if( ret==SUCCESS) {
-        * return_value = * htable;    
-    } else {
-        RETURN_FALSE;
-    }
+  php_peb_decode_impl(INTERNAL_FUNCTION_PARAM_PASSTHRU, 1);
 }
 
 PHP_FUNCTION(peb_error)
