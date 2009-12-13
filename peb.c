@@ -31,38 +31,7 @@
 
 /* $Id: header,v 1.16.2.1.2.1 2007/01/01 19:32:09 iliaa Exp $ */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#include "php.h"
-#include "php_ini.h"
-#include "ext/standard/info.h"
 #include "php_peb.h"
-
-
-/****************************************
-	constant define
-****************************************/
-#define PEB_VERSION "0.10b"
-#define PEB_ERRORNO_INIT 1
-#define PEB_ERROR_INIT		"ei_connect_init error"
-#define PEB_ERRORNO_CONN 2
-#define PEB_ERROR_CONN		"ei_connect error"
-#define PEB_ERRORNO_SEND 3
-#define PEB_ERROR_SEND		"ei_send error"
-#define PEB_ERRORNO_RECV 4
-#define PEB_ERROR_RECV		"ei_receive error"
-#define PEB_ERRORNO_NOTMINE 5
-#define PEB_ERROR_NOTMINE		 "ei_receive got a message but not mine"
-#define PEB_ERRORNO_DECODE 6
-#define PEB_ERROR_DECODE		"ei_decode error, unsupported data type"
-
-#define PEB_RESOURCENAME		"Php-Erlang Bridge"
-#define PEB_TERMRESOURCE		"Erlang Term"
-#define PEB_SERVERPID		 "Erlang Pid"
-
-#define PEB_RECEIVE_TMO 1000
 
 /****************************************
 	macros define
@@ -115,7 +84,7 @@ zend_module_entry peb_module_entry = {
 #if ZEND_MODULE_API_NO >= 20010901
 	STANDARD_MODULE_HEADER,
 #endif
-	"peb",
+	PHP_PEB_EXTNAME,
 	peb_functions,
 	PHP_MINIT(peb),
 	PHP_MSHUTDOWN(peb),
@@ -123,7 +92,7 @@ zend_module_entry peb_module_entry = {
 	PHP_RSHUTDOWN(peb), /* Replace with NULL if there's nothing to do at request end */
 	PHP_MINFO(peb),
 #if ZEND_MODULE_API_NO >= 20010901
-	PEB_VERSION, /* Replace with version number for your extension */
+	PHP_PEB_VERSION, /* Replace with version number for your extension */
 #endif
 	STANDARD_MODULE_PROPERTIES
 };
@@ -133,12 +102,14 @@ zend_module_entry peb_module_entry = {
 ZEND_GET_MODULE(peb)
 #endif
 
-/* {{{ PHP_INI
- */
-
-PHP_INI_BEGIN()
-		STD_PHP_INI_ENTRY("peb.global_value",			 "42", PHP_INI_ALL, OnUpdateLong, global_value, zend_peb_globals, peb_globals)
-PHP_INI_END()
+// /* {{{ PHP_INI
+//  */
+// 
+// PHP_INI_BEGIN()
+// 	STD_PHP_INI_ENTRY("peb.default_nodename", "server@localhost", PHP_INI_ALL, NULL)
+// 	STD_PHP_INI_ENTRY("peb.default_cookie", "COOKIE", PHP_INI_ALL, NULL)
+// 	STD_PHP_INI_ENTRY("peb.default_timeout", "5000", PHP_INI_ALL, NULL)
+// PHP_INI_END()
 
 /* }}} */
 
@@ -207,7 +178,7 @@ PHP_MINIT_FUNCTION(peb)
 		le_msgbuff = zend_register_list_destructors_ex(le_msgbuff_dtor,NULL,PEB_TERMRESOURCE,module_number);
 		le_serverpid = zend_register_list_destructors_ex(le_serverpid_dtor,NULL,PEB_SERVERPID,module_number);
 				
-	REGISTER_INI_ENTRIES();
+	// REGISTER_INI_ENTRIES();
 	return SUCCESS;
 }
 /* }}} */
@@ -266,7 +237,7 @@ PHP_MINFO_FUNCTION(peb)
 {
 	php_info_print_table_start();
 	php_info_print_table_row(2, "PEB (Php-Erlang Bridge) support", "enabled");
-		php_info_print_table_row(2, "version", PEB_VERSION);
+		php_info_print_table_row(2, "version", PHP_PEB_VERSION);
 	php_info_print_table_end();
 
 	DISPLAY_INI_ENTRIES();
@@ -376,6 +347,9 @@ static void php_peb_connect_impl(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 		efree(thisnode);
 
 		if ((fd = ei_connect_tmo(ec,node, tmo)) < 0) {
+				#ifdef DEBUG_PRINTF
+				php_printf("error :%d ", fd);
+				#endif
 				PEB_G(errorno) = PEB_ERRORNO_CONN;
 				PEB_G(error)=estrdup(PEB_ERROR_CONN);
 				efree(key);
@@ -564,7 +538,7 @@ PHP_FUNCTION(peb_send_bypid)
 PHP_FUNCTION(peb_receive)
 {
 		int ret;
-		unsigned int tmo = PEB_RECEIVE_TMO;
+		unsigned int tmo = PEB_DEFAULT_TMO;
 		peb_link * m;
 		zval * tmp;
 		ei_x_buff * newbuff;
