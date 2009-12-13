@@ -1,39 +1,81 @@
 /*
- 	Copyright (c) 2005-2010, York Liu <sadly@phpx.com>.
- 	All rights reserved.
- 	
- 	Redistribution and use in source and binary forms, with or without
- 	modification, are permitted provided that the following conditions are
- 	met:
- 	
- 	    * Redistributions of source code must retain the above copyright
- 	      notice, this list of conditions and the following disclaimer.
- 	    * Redistributions in binary form must reproduce the above
- 	      copyright notice, this list of conditions and the following
- 	      disclaimer in the documentation and/or other materials provided
- 	      with the distribution.
- 	    * Neither the name Message Systems, Inc. nor the names
- 	      of its contributors may be used to endorse or promote products
- 	      derived from this software without specific prior written
- 	      permission.
- 	
- 	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- 	"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- 	LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- 	A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- 	OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- 	SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- 	LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- 	DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- 	THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- 	OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+	Copyright (c) 2005-2010, York Liu <sadly@phpx.com>, Alvaro Videla <videlalvaro@gmail.com>
+	All rights reserved.
+	
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are
+	met:
+	
+			* Redistributions of source code must retain the above copyright
+				notice, this list of conditions and the following disclaimer.
+			* Redistributions in binary form must reproduce the above
+				copyright notice, this list of conditions and the following
+				disclaimer in the documentation and/or other materials provided
+				with the distribution.
+			* The names of the contributors may not be used to endorse or promote products
+				derived from this software without specific prior written
+				permission.
+	
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+	"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+	LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+	A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+	OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+	SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+	LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+	DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+	THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+	OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /* $Id: header,v 1.16.2.1.2.1 2007/01/01 19:32:09 iliaa Exp $ */
 
 #ifndef PHP_PEB_H
 #define PHP_PEB_H
+
+#define PHP_PEB_EXTNAME "peb"
+#define PHP_PEB_VERSION "0.2"
+
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "php.h"
+#include "php_ini.h"
+#include "ext/standard/info.h"
+
+//Erlang Libraries
+#include "ei.h"
+#include "erl_interface.h"
+
+/****************************************
+	Errors
+****************************************/
+#define PEB_ERL_
+#define PEB_ERRORNO_INIT 1
+#define PEB_ERROR_INIT		"ei_connect_init error"
+#define PEB_ERRORNO_CONN 2
+#define PEB_ERROR_CONN		"ei_connect error"
+#define PEB_ERRORNO_SEND 3
+#define PEB_ERROR_SEND		"ei_send error"
+#define PEB_ERRORNO_RECV 4
+#define PEB_ERROR_RECV		"ei_receive error"
+#define PEB_ERRORNO_NOTMINE 5
+#define PEB_ERROR_NOTMINE		 "ei_receive got a message but not mine"
+#define PEB_ERRORNO_DECODE 6
+#define PEB_ERROR_DECODE		"ei_decode error, unsupported data type"
+
+/****************************************
+	Resource names
+****************************************/
+#define PEB_RESOURCENAME		"Php-Erlang Bridge"
+#define PEB_TERMRESOURCE		"Erlang Term"
+#define PEB_SERVERPID				 "Erlang Pid"
+
+#define PEB_DEFAULT_TMO			 1000
+// #define DEBUG_PRINTF 1
 
 extern zend_module_entry peb_module_entry;
 #define phpext_peb_ptr &peb_module_entry
@@ -47,9 +89,6 @@ extern zend_module_entry peb_module_entry;
 #ifdef ZTS
 #include "TSRM.h"
 #endif
-
-#include "ei.h"
-#include "erl_interface.h"
 
 PHP_MINIT_FUNCTION(peb);
 PHP_MSHUTDOWN_FUNCTION(peb);
@@ -78,7 +117,9 @@ PHP_FUNCTION(peb_status);
 
 
 ZEND_BEGIN_MODULE_GLOBALS(peb)
-	long global_value;
+	// char *default_nodename;
+	// char *default_cookie;
+	// long default_timeout;
 
 	long default_link;
 	long num_link,num_persistent;
