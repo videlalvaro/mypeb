@@ -249,9 +249,9 @@ PHP_MINFO_FUNCTION(peb)
 	 Outputs extension status information */
 PHP_FUNCTION(peb_status)
 {
-		php_printf("\r\n<br>default link: %d",PEB_G(default_link));
-		php_printf("\r\n<br>num link: %d",PEB_G(num_link));
-		php_printf("\r\n<br>num persistent: %d",PEB_G(num_persistent));
+		php_printf("\r\n<br>default link: %d", (int) PEB_G(default_link));
+		php_printf("\r\n<br>num link: %d", (int) PEB_G(num_link));
+		php_printf("\r\n<br>num persistent: %d", (int) PEB_G(num_persistent));
 		return;
 }
 /* }}} */
@@ -800,7 +800,7 @@ int _peb_encode_term(ei_x_buff* x,char **fmt,int * fmtpos, HashTable *arr, unsig
 
 }
 
-int _peb_encode(ei_x_buff* x, char** fmt, int * fmtpos, HashTable *arr, unsigned long * arridx)
+int _peb_encode(ei_x_buff* x, char** fmt, int fmt_len, int * fmtpos, HashTable *arr, unsigned long * arridx)
 {
 		/*
 		~a - an atom, char*
@@ -822,13 +822,32 @@ int _peb_encode(ei_x_buff* x, char** fmt, int * fmtpos, HashTable *arr, unsigned
 		zval * tmp;
 	ei_x_buff * newbuff;
 
-		 // php_printf("<br>enter for fmtpos %d fmtstr: %c </br>\r\n\r\n", *fmtpos, *p ); 
+    // php_printf("<br>enter for fmtpos %d fmtstr: %c arridx: %d</br>\r\n\r\n", *fmtpos, *p , *arridx);
 					
 		while (*p==' ')
 		{
 				++p;
 				(*fmtpos)++;
 		}
+
+    // Special case, empty list.
+    if( *p == '[' && *(p+1) == ']') {
+        // php_printf("Inside IF: fmt_len: %d\n", fmt_len);
+        ei_x_encode_empty_list( x );
+        ++p; //consumer current char
+        (*fmtpos)++;
+        ++p; //consumer ] char
+        (*fmtpos)++;
+        
+        (*arridx)++;
+        
+        if((fmt_len - 1) <= *fmtpos){
+          
+          // php_printf("\n\n\n\nfmt_len: %d fmtpos %d\n\n\n\n", fmt_len, *fmtpos);
+          return;
+        }
+        _peb_encode(x,fmt,fmt_len,fmtpos,arr,arridx);
+    }
 
 		switch (*p) {
 		case '~':
@@ -837,13 +856,28 @@ int _peb_encode(ei_x_buff* x, char** fmt, int * fmtpos, HashTable *arr, unsigned
 
 		case '[':
 				if (zend_hash_index_find(arr,*arridx,(void**)&tmp)==SUCCESS) {
+				  
 					newarr= Z_ARRVAL_PP((zval**)tmp);
+					
+					//empty list handling
+					if(zend_hash_num_elements(newarr) == 0 && *(p+1) == '[' && *(p+2) == ']'){
+            ei_x_encode_empty_list(x);
+            ++p; //advance from current char
+            (*fmtpos)++;
+            ++p; //avoid [
+            (*fmtpos)++;
+            ++p; //avoid ]
+            (*fmtpos)++;
+            (*arridx)++;
+            break;
+      	  }
+      	  
 					++p;
 					(*fmtpos)++;
 					newbuff = emalloc(sizeof(ei_x_buff));
 					ei_x_new(newbuff);
 
-					_peb_encode(newbuff, fmt, fmtpos, newarr,&newidx);
+					_peb_encode(newbuff, fmt, fmt_len, fmtpos, newarr,&newidx);
 			 
 					if(newidx!=0) {
 /*						php_printf("newidx:%d",newidx); */
@@ -875,7 +909,7 @@ int _peb_encode(ei_x_buff* x, char** fmt, int * fmtpos, HashTable *arr, unsigned
 					newbuff = emalloc(sizeof(ei_x_buff));
 					ei_x_new(newbuff);
 
-					_peb_encode(newbuff, fmt, fmtpos, newarr,&newidx);
+					_peb_encode(newbuff, fmt, fmt_len, fmtpos, newarr,&newidx);
 			 
 					if(newidx!=0) {
 /*						php_printf("newidx:%d",newidx); */
@@ -908,7 +942,7 @@ int _peb_encode(ei_x_buff* x, char** fmt, int * fmtpos, HashTable *arr, unsigned
 				break;
 		}
 
-		_peb_encode(x,fmt,fmtpos,arr,arridx);
+		_peb_encode(x,fmt,fmt_len,fmtpos,arr,arridx);
 }
 
 static void php_peb_encode_impl(INTERNAL_FUNCTION_PARAMETERS, int with_version)
@@ -939,7 +973,8 @@ static void php_peb_encode_impl(INTERNAL_FUNCTION_PARAMETERS, int with_version)
 		ei_x_new(x);
 	}
 	
-	_peb_encode(x, &fmt, &fmtpos, htable,&arridx);
+	_peb_encode(x, &fmt, fmt_len, &fmtpos, htable,&arridx);
+	
 	ZEND_REGISTER_RESOURCE(return_value,x,le_msgbuff);
 }
 
