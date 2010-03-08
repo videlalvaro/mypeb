@@ -70,7 +70,7 @@
 /****************************************
 	Resource names
 ****************************************/
-#define PEB_RESOURCENAME		"Php-Erlang Bridge"
+#define PEB_RESOURCENAME		"PHP-Erlang Bridge"
 #define PEB_TERMRESOURCE		"Erlang Term"
 #define PEB_SERVERPID				 "Erlang Pid"
 
@@ -115,6 +115,7 @@ PHP_FUNCTION(peb_linkinfo);
 
 PHP_FUNCTION(peb_status);
 
+PHP_FUNCTION(peb_print_term);
 
 ZEND_BEGIN_MODULE_GLOBALS(peb)
 	// char *default_nodename;

@@ -74,6 +74,7 @@ zend_function_entry peb_functions[] = {
 	PHP_FE(peb_errorno, NULL)
 	PHP_FE(peb_linkinfo,	NULL)
 	PHP_FE(peb_status,	NULL)
+	PHP_FE(peb_print_term,	NULL)
 	{NULL, NULL, NULL}	/* Must be the last line in peb_functions[] */
 };
 /* }}} */
@@ -304,7 +305,7 @@ static void php_peb_connect_impl(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 		}
 		
 		#ifdef DEBUG_PRINTF
-		php_printf("timeout :%d", tmo);
+		php_printf("timeout :%d\n", tmo);
 		#endif
 
 		key_len = spprintf(&key, 0, "peb_%s_%s",node,secret);
@@ -348,7 +349,7 @@ static void php_peb_connect_impl(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 
 		if ((fd = ei_connect_tmo(ec,node, tmo)) < 0) {
 				#ifdef DEBUG_PRINTF
-				php_printf("error :%d ", fd);
+				php_printf("error :%d\n", fd);
 				#endif
 				PEB_G(errorno) = PEB_ERRORNO_CONN;
 				PEB_G(error)=estrdup(PEB_ERROR_CONN);
@@ -834,9 +835,9 @@ int _peb_encode(ei_x_buff* x, char** fmt, int fmt_len, int * fmtpos, HashTable *
     if( *p == '[' && *(p+1) == ']') {
         // php_printf("Inside IF: fmt_len: %d\n", fmt_len);
         ei_x_encode_empty_list( x );
-        ++p; //consumer current char
+        ++p; //consume current char
         (*fmtpos)++;
-        ++p; //consumer ] char
+        ++p; //consume ] char
         (*fmtpos)++;
         
         (*arridx)++;
@@ -864,9 +865,9 @@ int _peb_encode(ei_x_buff* x, char** fmt, int fmt_len, int * fmtpos, HashTable *
             ei_x_encode_empty_list(x);
             ++p; //advance from current char
             (*fmtpos)++;
-            ++p; //avoid [
+            ++p; //skip [
             (*fmtpos)++;
-            ++p; //avoid ]
+            ++p; //skip ]
             (*fmtpos)++;
             (*arridx)++;
             break;
@@ -1131,7 +1132,7 @@ static void php_peb_decode_impl(INTERNAL_FUNCTION_PARAMETERS, int with_version)
 	}
 }
 
-/* {{{ proto mixed peb_vdecode(resource msgbuffer)
+/* {{{ proto mixed peb_decode(resource msgbuffer)
    Decodes and Erlang term that was send without version magic number */
 PHP_FUNCTION(peb_decode)
 {
@@ -1170,6 +1171,35 @@ PHP_FUNCTION(peb_error)
 PHP_FUNCTION(peb_errorno)
 {
 	RETURN_LONG(PEB_G(errorno));
+}
+/* }}} */
+
+/* {{{ proto resource peb_print_term(resource $term [, bool $return = false])
+   Prints the erlang term to the screen
+   If $return is set to true, then it returns the string instead of priting it */
+PHP_FUNCTION(peb_print_term)
+{
+  char *term = NULL;
+  zval * msg=NULL;
+  ei_x_buff * newbuff;
+  int i = 0;
+  
+  int ret = 0;
+	
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r|b", &msg, &ret) == FAILURE) {
+			RETURN_FALSE;
+	}
+	
+	ZEND_FETCH_RESOURCE(newbuff, ei_x_buff*, &msg TSRMLS_CC,-1 , PEB_TERMRESOURCE ,le_msgbuff);
+	
+	ei_s_print_term(&term, newbuff->buff, &i);
+	if(ret){
+    RETVAL_STRING(term, 0);
+    return;
+	} else{
+	  php_printf("%s", term);
+	  return SUCCESS;
+	}
 }
 /* }}} */
 
