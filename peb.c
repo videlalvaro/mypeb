@@ -477,6 +477,7 @@ PHP_FUNCTION(peb_send_byname)
 		ZEND_FETCH_RESOURCE2(m, peb_link*, &tmp TSRMLS_CC,-1 , PEB_RESOURCENAME ,le_link, le_plink);
 
 		ZEND_FETCH_RESOURCE(newbuff, ei_x_buff *, &msg TSRMLS_CC,-1 , PEB_TERMRESOURCE ,le_msgbuff);
+		
 	
 		ret = ei_reg_send_tmo(m->ec, m->fd, model_name, newbuff->buff, newbuff->index, tmo);
 
@@ -1182,7 +1183,7 @@ PHP_FUNCTION(peb_print_term)
   char *term = NULL;
   zval * msg=NULL;
   ei_x_buff * newbuff;
-  int i = 0;
+  int intp = 0;
   
   int ret = 0;
 	
@@ -1190,15 +1191,18 @@ PHP_FUNCTION(peb_print_term)
 			RETURN_FALSE;
 	}
 	
-	ZEND_FETCH_RESOURCE(newbuff, ei_x_buff*, &msg TSRMLS_CC,-1 , PEB_TERMRESOURCE ,le_msgbuff);
+	ZEND_FETCH_RESOURCE(newbuff, ei_x_buff*, &msg TSRMLS_CC,-1 ,PEB_TERMRESOURCE, le_msgbuff);
 	
-	ei_s_print_term(&term, newbuff->buff, &i);
+	ei_s_print_term(&term, newbuff->buff, &intp);
+	
+  intp = NULL;
+  
 	if(ret){
     RETVAL_STRING(term, 0);
     return;
 	} else{
 	  php_printf("%s", term);
-	  return SUCCESS;
+    return;
 	}
 }
 /* }}} */
