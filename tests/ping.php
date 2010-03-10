@@ -14,7 +14,7 @@ peb_status();
 echo "<br>\r\n";
 echo "<br>\r\n";
 
-$x = peb_encode("[~a,~a]", array(
+$x = peb_vencode("[~a,~a]", array(
 								array( "hello", "friend" )
 								)
 			   );
