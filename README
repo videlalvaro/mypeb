@@ -1,6 +1,8 @@
-peb (Php-Erlang Bridge) is an open-source php extension to run php as an Erlang cnode.
+peb (Php-Erlang Bridge) is an open-source php extension to run php as an
+Erlang cnode.
 
-It's similar to the traditional php mysql function, you can communicate with Erlang node easy. 
+It's similar to the traditional php mysql function, you can communicate
+with Erlang node easy. 
 
 Checkout our website for complete manual http://mypeb.googlecode.com
 
@@ -8,13 +10,15 @@ Installation:
 
 Run the following commands:
 phpize
+./configure --help
 ./configure
 make
 make install
 
-
-On OS X you will have to run the configure command like this:
-
-./configure CC="gcc -m32 -L/usr/local/lib/erlang/lib/erl_interface-3.6.5/lib -I/usr/local/lib/erlang/lib/erl_interface-3.6.5/include"
-
-Providing the proper path to erl_interface
+Note:
+  You can specify the location of both Erlang interface libraries
+  and Erlang interface header files by using --with-erlang=DIR. The
+  configure script will look for libraries and headers in DIR/lib and
+  DIR/include respectively.
+  In case libraries and headers do not share a common parent directory,
+  use --with-erlanglib=LIB and --with-erlanginc=INCLUDE instead.
