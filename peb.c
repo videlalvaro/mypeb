@@ -347,11 +347,20 @@ static void php_peb_connect_impl(INTERNAL_FUNCTION_PARAMETERS, int persistent)
   }
 
   ec = pemalloc(sizeof(ei_cnode),persistent);
+  
+  int instance;
+  if(persistent)
+  {
+    instance = 0;
+    this_len = spprintf(&thisnode, 0, "peb_client_%d_%d", getpid(), instance);
+  }
+  else
+  {
+    instance = PEB_G(instanceid)++;
+    this_len = spprintf(&thisnode, 0, "peb_client_%d", getpid());
+  }
 
-  int instance = persistent?0:PEB_G(instanceid)++;
-  this_len = spprintf(&thisnode, 0, "peb_client_%d_%d", getpid(), instance);
-
-  /* php_printf("node name:%s",thisnode); */
+  // php_printf("node name:%s", thisnode);
 
   if(ei_connect_init(ec, thisnode, secret, instance) < 0)
   {
