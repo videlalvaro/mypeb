@@ -1,8 +1,10 @@
+This project is a fork of [http://code.google.com/p/mypeb/](http://code.google.com/p/mypeb/). All future development and bug fixes will happeen in this github repository.
+
 peb (Php-Erlang Bridge) is an open-source php extension to run php as an
 Erlang cnode.
 
 It's similar to the traditional php mysql function, you can communicate
-with Erlang node easy. 
+with Erlang node easy.
 
 Checkout our website for complete manual http://mypeb.googlecode.com
 
