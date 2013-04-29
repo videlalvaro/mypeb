@@ -309,8 +309,8 @@ static void php_peb_connect_impl(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 
   peb_link * alink = NULL;
   ei_cnode * ec = NULL;
-  list_entry * le ;
-  list_entry * newle;
+  zend_rsrc_list_entry * le ;
+  zend_rsrc_list_entry * newle;
 
   if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,"ss|l",&node,&node_len,&secret,&secret_len,&tmo)==FAILURE)
   {
@@ -396,10 +396,10 @@ static void php_peb_connect_impl(INTERNAL_FUNCTION_PARAMETERS, int persistent)
   {
     PEB_G(num_link)++;
     PEB_G(num_persistent)++;
-    newle = pemalloc(sizeof(list_entry),persistent);
+    newle = pemalloc(sizeof(zend_rsrc_list_entry),persistent);
     newle->ptr = alink;
     newle->type = le_plink;
-    zend_hash_update(&EG(persistent_list), key, key_len+1, newle,sizeof(list_entry), NULL );
+    zend_hash_update(&EG(persistent_list), key, key_len+1, newle,sizeof(zend_rsrc_list_entry), NULL );
     PEB_G(default_link) = Z_LVAL_P(return_value TSRMLS_CC);
     ZEND_REGISTER_RESOURCE(return_value, alink, le_plink);
   }
