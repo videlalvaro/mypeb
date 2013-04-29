@@ -53,6 +53,8 @@ if test "$PHP_PEB" = "yes"; then
 
   CPPFLAGS="${CPPFLAGS} ${INCLUDES}"
 
+  AC_CHECK_LIB([pthread], [pthread_mutex_trylock], [],
+      [AC_MSG_ERROR([Could not find libpthread])])
   AC_CHECK_LIB([ei], [ei_connect_init], [],
       [AC_MSG_ERROR([Could not find libei])])
   AC_CHECK_LIB([erl_interface], [erl_connect], [],
