@@ -756,6 +756,7 @@ int _peb_encode_term(ei_x_buff* x,char **fmt,int * fmtpos, HashTable *arr, unsig
   zval ** pdata;
   ei_x_buff * newbuff, decoded;
   peb_link *m;
+  erlang_pid *ep;
 
 
   ++p;
@@ -841,6 +842,22 @@ int _peb_encode_term(ei_x_buff* x,char **fmt,int * fmtpos, HashTable *arr, unsig
         newbuff = emalloc(sizeof(ei_x_buff));
         ei_x_new(newbuff);
         ei_x_encode_pid(newbuff, &(m->ec->self));
+        ei_x_append(x,newbuff);
+        ei_x_free(newbuff);
+        efree(newbuff);
+      }
+    }
+    ++(*arridx);
+    break;
+  case 'n':
+    if(zend_hash_index_find(arr,*arridx,(void**) &pdata)==SUCCESS)
+    { 
+      ep = (erlang_pid*) zend_fetch_resource(pdata TSRMLS_CC,-1 , PEB_SERVERPID , NULL, 2, le_serverpid);
+      if(ep)
+      { 
+        newbuff = emalloc(sizeof(ei_x_buff));
+        ei_x_new(newbuff);
+        ei_x_encode_pid(newbuff, ep);
         ei_x_append(x,newbuff);
         ei_x_free(newbuff);
         efree(newbuff);
