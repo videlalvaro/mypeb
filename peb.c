@@ -852,7 +852,7 @@ int _peb_encode_term(ei_x_buff* x,char **fmt,int * fmtpos, HashTable *arr, unsig
   case 'P':
     if(zend_hash_index_find(arr,*arridx,(void**) &pdata)==SUCCESS)
     { 
-      ep = (erlang_pid*) zend_fetch_resource(pdata TSRMLS_CC,-1 , PEB_SERVERPID , NULL, 2, le_serverpid);
+      ep = (erlang_pid*) zend_fetch_resource(pdata TSRMLS_CC,-1 , PEB_SERVERPID , NULL, 1, le_serverpid);
       if(ep)
       { 
         newbuff = emalloc(sizeof(ei_x_buff));
