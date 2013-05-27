@@ -849,7 +849,7 @@ int _peb_encode_term(ei_x_buff* x,char **fmt,int * fmtpos, HashTable *arr, unsig
     }
     ++(*arridx);
     break;
-  case 'n':
+  case 'P':
     if(zend_hash_index_find(arr,*arridx,(void**) &pdata)==SUCCESS)
     { 
       ep = (erlang_pid*) zend_fetch_resource(pdata TSRMLS_CC,-1 , PEB_SERVERPID , NULL, 2, le_serverpid);
