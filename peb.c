@@ -749,7 +749,7 @@ PHP_FUNCTION(peb_rpc_to)
 }
 /* }}} */
 
-int _peb_encode_term(ei_x_buff* x,char **fmt,int * fmtpos, HashTable *arr, unsigned long * arridx)
+void _peb_encode_term(ei_x_buff* x,char **fmt,int * fmtpos, HashTable *arr, unsigned long * arridx)
 {
   char* p = *fmt + *fmtpos;
   int i,v;
@@ -876,7 +876,7 @@ int _peb_encode_term(ei_x_buff* x,char **fmt,int * fmtpos, HashTable *arr, unsig
   _peb_encode_term(x,fmt,fmtpos,arr,arridx);
 }
 
-int _peb_encode(ei_x_buff* x, char** fmt, int fmt_len, int * fmtpos, HashTable *arr, unsigned long * arridx)
+void _peb_encode(ei_x_buff* x, char** fmt, int fmt_len, int * fmtpos, HashTable *arr, unsigned long * arridx)
 {
   /*
   ~a - an atom, char*
@@ -1275,7 +1275,7 @@ PHP_FUNCTION(peb_print_term)
   
   ei_s_print_term(&term, newbuff->buff, &intp);
   
-  intp = NULL;
+  // intp = NULL;
   
   if(ret)
   {
