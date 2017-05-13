@@ -1,10 +1,10 @@
 # MyPeb: PHP Erlang Bridge #
 
-This project is a fork of [http://code.google.com/p/mypeb/](http://code.google.com/p/mypeb/). All future development and bug fixes will happeen in this github repository.
+This project is a fork of [http://code.google.com/p/mypeb/](http://code.google.com/p/mypeb/). All future development and bug fixes will happen in this github repository.
 
 PEB (Php-Erlang Bridge) is an open-source php extension to run php as an Erlang cnode.
 
-Checkout our website for complete manual http://mypeb.googlecode.com
+Checkout the wiki for complete manual https://github.com/videlalvaro/mypeb/wiki
 
 ## Installation ##
 
@@ -26,4 +26,19 @@ For example with a default installation of Erlang from the `ESL Erlang Packages`
 
 ```bash
 ./configure --with-erlanglib=/usr/local/lib/erlang/lib/erl_interface-3.7.11/lib/ --with-erlanginc=/usr/local/lib/erlang/lib/erl_interface-3.7.11/include/
+```
+Usage example:
+
+```php
+$msg = peb_vencode('[~p,~a]', array( array($link,'getinfo') ) ); //The sender must include a reply address. use ~p to format a link identifier to a valid Erlang pid.
+
+peb_send_byname('pong',$msg,$link);
+
+$message = peb_receive($link); $rs= peb_vdecode( $message) ; print_r($rs);
+
+$serverpid = $rs[0][0];
+
+$message = peb_vencode('[~s]', array( array('how are you') ) ); peb_send_bypid($serverpid,$message,$link); //just demo for how to use peb_send_bypid
+
+peb_close($link); ?> 
 ```
